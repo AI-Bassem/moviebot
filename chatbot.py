@@ -58,27 +58,39 @@ documents = loader.load_data(file)
 llm = OctoAiCloudLLM(endpoint_url=endpoint_url)
 llm_predictor = LLMPredictor(llm=llm)
 
-# Create the LangchainEmbedding and ServiceContext
-embeddings = LangchainEmbedding(
-    HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
-) if 'embeddings' not in st.session_state else st.session_state.embeddings
+# Create the LangchainEmbedding
+if 'embeddings' not in st.session_state:
+    embeddings = LangchainEmbedding(
+        HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2"))
+    st.session_state.embeddings = embeddings
+else:
+    embeddings = st.session_state.embeddings
+# Create the ServiceContext
+if 'service_context' not in st.session_state:
+    service_context = ServiceContext.from_defaults(
+        llm_predictor=llm_predictor, chunk_size_limit=1024, embed_model=embeddings)
+    st.session_state.service_context = service_context
+else:
+    service_context = st.session_state.service_context
 
-service_context = ServiceContext.from_defaults(
-    llm_predictor=llm_predictor, chunk_size_limit=1024, embed_model=embeddings
-) if 'service_context' not in st.session_state else st.session_state.service_context
+# Create the index from documents
+if 'index' not in st.session_state:
+    index = GPTVectorStoreIndex.from_documents(
+        documents, service_context=service_context)
+    st.session_state.index = index
+else:
+    index = st.session_state.index
 
-# Create the index from documents and the query engine
-index = GPTVectorStoreIndex.from_documents(
-    documents, service_context=service_context
-) if 'index' not in st.session_state else st.session_state.index
-
-query_engine = index.as_query_engine(
-    verbose=True, llm_predictor=llm_predictor
-) if 'query_engine' not in st.session_state else st.session_state.query_engine
-
+# Create the query engine
+if 'query_engine' not in st.session_state:
+    query_engine = index.as_query_engine(
+        verbose=True, llm_predictor=llm_predictor)
+    st.session_state.query_engine = query_engine
+else:
+    query_engine = st.session_state.query_engine
+    
+    
 # Function to handle query
-
-
 def query(payload):
     response = query_engine.query(payload["inputs"]["text"])
     # Transform response to string and remove
@@ -93,8 +105,6 @@ def form_callback():
     st.session_state.input_value = st.session_state.input
 
 # Function to get text
-
-
 def get_text(count):
     if count == 0:
         label = "Type a question about a movie: "
@@ -119,7 +129,7 @@ if user_input and user_input.strip() != '':
             "generated_responses": st.session_state.generated,
             "text": user_input,
         },
-        "parameters": {"repetition_penalty": 1.33},
+        "parameters": {"": ""},
     })
 
     # Increment count, append user input and generated output to session state
