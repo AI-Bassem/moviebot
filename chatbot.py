@@ -1,9 +1,6 @@
 # Libraries for file handling, logging, environment variable loading
 import os
-import logging
 from pathlib import Path
-from dotenv import load_dotenv
-import requests
 # Libraries for web application and HTTP requests
 import streamlit as st
 from streamlit_chat import message
@@ -16,7 +13,6 @@ from llama_index import (LLMPredictor, ServiceContext,
                          download_loader, GPTVectorStoreIndex, LangchainEmbedding)
 
 # Load environment variables and set page configurations
-load_dotenv()
 st.set_page_config(
     page_title="OctoAI Movie Bot - Demo",
     page_icon=":robot:"
