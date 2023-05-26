@@ -1,0 +1,9 @@
+streamlit
+streamlit-chat
+requests
+langchain
+llama_index
+pydantic
+python-dotenv
+Requests
+sentence-transformers
