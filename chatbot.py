@@ -98,7 +98,7 @@ def form_callback():
 def get_text(count):
     if count == 0:
         label = "Type a question about a movie: "
-        value = "Who starred in Titanic?"
+        value = "Who starred in the movie: Titanic?"
         input_text = st.text_input(
             label=label, value=value, key="input", on_change=form_callback)
     else:
