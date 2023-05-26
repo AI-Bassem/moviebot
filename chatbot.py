@@ -37,7 +37,7 @@ def handle_session_state():
         st.session_state['past'] = []
 
     if 'count' not in st.session_state:
-        st.session_state.count = 0
+        st.session_state['count'] = 0
         st.session_state.chat_history_ids = None
         st.session_state.old_response = ''
 
@@ -129,7 +129,10 @@ if user_input and user_input.strip() != '':
     })
 
     # Increment count, append user input and generated output to session state
-    st.session_state.count += 1
+    try:
+        st.session_state.count += 1
+    except:
+        st.session_state['count'] = 1
     st.session_state.past.append(user_input)
     if output:
         st.session_state.generated.append(output)
