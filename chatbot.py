@@ -13,13 +13,9 @@ from langchain.text_splitter import TokenTextSplitter
 from langchain.vectorstores import FAISS
 from langchain.chains import RetrievalQA
 
-from langchain.llms import OpenAI
-from langchain.embeddings.openai import OpenAIEmbeddings
-from langchain.callbacks import get_openai_callback
 from langchain.agents import create_csv_agent
 from dotenv import load_dotenv
 from OctoAiCloudLLM import OctoAiCloudLLM
-from langchain import HuggingFaceHub, OpenAI, PromptTemplate, LLMChain
 from langchain.embeddings import HuggingFaceEmbeddings
 from llama_index import ( LLMPredictor, ServiceContext, download_loader, GPTVectorStoreIndex, LangchainEmbedding)
 # Get the current file's directory
@@ -33,7 +29,7 @@ import requests
 import os
 from OctoAiCloudLLM import OctoAiCloudLLM
 st.set_page_config(
-    page_title="Streamlit Chat - Demo",
+    page_title="OctoAI Movie Bot - Demo",
     page_icon=":robot:"
     )
 os.environ["OCTOAI_API_TOKEN"] = st.secrets['OCTOAI_API_TOKEN']
