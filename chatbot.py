@@ -1,6 +1,7 @@
 # Libraries for file handling, logging, environment variable loading
 import os
 from pathlib import Path
+import pickle
 # Libraries for web application and HTTP requests
 import streamlit as st
 from streamlit_chat import message
@@ -14,7 +15,7 @@ from llama_index import (LLMPredictor, ServiceContext,
 
 # Load environment variables and set page configurations
 st.set_page_config(
-    page_title="OctoAI Movie Bot - Demo",
+    page_title="​🎬  OctoAI Movie Bot - Demo",
     page_icon=":robot:"
 )
 
@@ -23,7 +24,7 @@ os.environ["OCTOAI_API_TOKEN"] = st.secrets['OCTOAI_API_TOKEN']
 os.environ["ENDPOINT_URL"] = st.secrets['ENDPOINT_URL']
 endpoint_url = os.getenv("ENDPOINT_URL")
 
-st.header("Movie Bot - Demo")
+st.header("​🎬  Movie Bot - Demo")
 
 # Function to handle session state
 
@@ -69,8 +70,13 @@ else:
 
 # Create the index from documents
 if 'index' not in st.session_state:
-    index = GPTVectorStoreIndex.from_documents(
-        documents, service_context=service_context)
+    path = Path("index.pkl")
+    if path.exists():
+       index= pickle.load(open(path, "rb"))
+    else:
+        index = GPTVectorStoreIndex.from_documents(
+            documents, service_context=service_context)
+        #pickle.dump(index, open(path, "wb")) https://github.com/jerryjliu/llama_index/issues/886
     st.session_state['index'] = index
 else:
     index = st.session_state['index']
@@ -93,22 +99,14 @@ def query(payload):
     return response
 
 # Function to handle form callback
-
-
-def form_callback():
-    st.session_state['input_value'] = st.session_state['input']
-
-# Function to get text
+ 
 def get_text(q_count):
-    if q_count == 0:
-        label = "Type a question about a movie: "
-        value = "Who starred in the movie: Titanic?"
-        input_text = st.text_input(
-            label=label, value=value, key="input", on_change=form_callback)
-    else:
-        label = "User: "
-        value = st.session_state['input_value']
-        input_text = st.text_input(label=label, value=value, key="input")
+     
+    label = "Type a question about a movie: "
+    value = "Enter your question here..."
+    input_text = st.text_input(
+        label=label, value=value, key="input")#, on_change=form_callback)
+
     return input_text
 
 
