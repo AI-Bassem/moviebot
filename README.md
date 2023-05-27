@@ -1,5 +1,4 @@
 
-Here is the raw Markdown code:
 
 # Movie Bot - Demo
 
