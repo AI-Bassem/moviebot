@@ -115,7 +115,7 @@ def get_text(count):
 
 
 # User input
-user_input = get_text(count=st.session_state.count)
+user_input = get_text(count=st.session_state['count'])
 
 # If user input is not empty, process the input
 if user_input and user_input.strip() != '':
@@ -130,7 +130,7 @@ if user_input and user_input.strip() != '':
 
     # Increment count, append user input and generated output to session state
     try:
-        st.session_state.count += 1
+        st.session_state['count'] += 1
     except:
         st.session_state['count'] = 1
     st.session_state.past.append(user_input)
