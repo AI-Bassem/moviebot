@@ -18,7 +18,10 @@ st.set_page_config(
     page_title="​🎬  OctoAI Movie Bot - Demo",
     page_icon=":robot:"
 )
-
+# Get the current file's directory
+current_dir = os.path.dirname(os.path.abspath(__file__))
+# Change the current working directory
+os.chdir(current_dir)
 # Set global variables
 os.environ["OCTOAI_API_TOKEN"] = st.secrets['OCTOAI_API_TOKEN']
 os.environ["ENDPOINT_URL"] = st.secrets['ENDPOINT_URL']
@@ -100,12 +103,15 @@ def query(payload):
 
 # Function to handle form callback
  
+def form_callback():
+    st.session_state['input_value'] = st.session_state['input']
+    
 def get_text(q_count):
      
     label = "Type a question about a movie: "
-    value = "Enter your question here..."
+    value = "Who directed the movie Jaws?\n"
     input_text = st.text_input(
-        label=label, value=value, key="input")#, on_change=form_callback)
+        label=label, value=value, key="input", on_change=form_callback)
 
     return input_text
 
