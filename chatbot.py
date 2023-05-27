@@ -38,8 +38,6 @@ def handle_session_state():
 
     if 'count' not in st.session_state:
         st.session_state['count'] = 0
-        st.session_state.chat_history_ids = None
-        st.session_state.old_response = ''
 
 
 handle_session_state()
@@ -64,7 +62,7 @@ else:
 # Create the ServiceContext
 if 'service_context' not in st.session_state:
     service_context = ServiceContext.from_defaults(
-        llm_predictor=llm_predictor, chunk_size_limit=1024, embed_model=embeddings)
+        llm_predictor=llm_predictor, chunk_size_limit=512, embed_model=embeddings)
     st.session_state.service_context = service_context
 else:
     service_context = st.session_state.service_context
