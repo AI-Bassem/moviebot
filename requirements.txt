@@ -7,3 +7,6 @@ pydantic
 python-dotenv
 Requests
 sentence-transformers
+octoai
+transformers
+hugginface
