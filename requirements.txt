@@ -9,4 +9,4 @@ Requests
 sentence-transformers
 octoai
 transformers
-hugginface
+huggingface
