@@ -9,7 +9,7 @@ from streamlit_chat import message
 from langchain.document_loaders.csv_loader import CSVLoader
 from langchain.agents import create_csv_agent
 from langchain.embeddings import HuggingFaceEmbeddings
-from OctoAiCloudLLM import OctoAiCloudLLM
+from octoai_endpoint import OctoAIEndpoint
 from llama_index import (LLMPredictor, ServiceContext,
                          download_loader, GPTVectorStoreIndex, LangchainEmbedding)
 
@@ -53,7 +53,17 @@ loader = PagedCSVReader()
 documents = loader.load_data(file)
 
 # Initialize the OctoAiCloudLLM and LLMPredictor
-llm = OctoAiCloudLLM(endpoint_url=endpoint_url)
+llm = OctoAIEndpoint(
+        endpoint_url=endpoint_url,
+        model_kwargs={
+            "max_new_tokens": 200,
+            "temperature": 0.75,
+            "top_p": 0.95,
+            "repetition_penalty": 1,
+            "seed": None,
+            "stop": [],
+        },
+    )
 llm_predictor = LLMPredictor(llm=llm)
 
 # Create the LangchainEmbedding
@@ -66,7 +76,7 @@ else:
 # Create the ServiceContext
 if 'service_context' not in st.session_state:
     service_context = ServiceContext.from_defaults(
-        llm_predictor=llm_predictor, chunk_size_limit=512, embed_model=embeddings)
+        llm_predictor=llm_predictor, chunk_size_limit=256, embed_model=embeddings)
     st.session_state['service_context'] = service_context
 else:
     service_context = st.session_state['service_context']
@@ -110,10 +120,9 @@ def get_text(q_count):
      
     label = "Type a question about a movie: "
     value = "Who directed the movie Jaws?\n"
-    input_text = st.text_input(
-        label=label, value=value, key="input", on_change=form_callback)
-
-    return input_text
+    return st.text_input(
+        label=label, value=value, key="input", on_change=form_callback
+    )
 
 
 # User input
@@ -133,7 +142,7 @@ if user_input and user_input.strip() != '':
     # Increment q_count, append user input and generated output to session state
     try:
         st.session_state['q_count'] += 1
-    except:
+    except Exception:
         st.session_state['q_count'] = 1
     st.session_state['past'].append(user_input)
     if output:
@@ -143,5 +152,4 @@ if user_input and user_input.strip() != '':
 if st.session_state['generated']:
     for i in range(len(st.session_state['generated'])-1, -1, -1):
         message(st.session_state["generated"][i], key=str(i))
-        message(st.session_state['past'][i],
-                is_user=True, key=str(i) + '_user')
+        message(st.session_state['past'][i], is_user=True, key=f'{str(i)}_user')
