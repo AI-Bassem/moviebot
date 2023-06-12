@@ -50,7 +50,7 @@ class OctoAIEmbeddings(BaseModel, Embeddings):
         """Common functionality for compute embeddings using a OctoAI instruct model."""
         parameter_payload = {
             "sentence": str([[item] for item in text]),
-            "instruction": str([instruction]),
+            "instruction": str([[instruction] for item in text]),
             "parameters": self.model_kwargs or {}
         }
 
@@ -67,9 +67,11 @@ class OctoAIEmbeddings(BaseModel, Embeddings):
 
     def embed_documents(self, texts: List[str]) -> List[List[float]]:
         """Compute document embeddings using an OctoAI instruct model."""
+        texts = list(map(lambda x: x.replace("\n", " "), texts))
         return [self._compute_embeddings(texts, self.embed_instruction)]
 
     def embed_query(self, text: str) -> List[float]:
         """Compute query embedding using an OctoAI instruct model."""
+        text = text.replace("\n", " ")
         return self._compute_embeddings([text], self.embed_instruction)
 
