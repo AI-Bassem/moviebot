@@ -1,6 +1,7 @@
 # Import the required libraries
 import os
 import dill
+import Image
 import streamlit as st
 from pathlib import Path
 from streamlit_chat import message
@@ -13,7 +14,7 @@ from llama_index import (LLMPredictor, ServiceContext,
                          download_loader, GPTVectorStoreIndex, LangchainEmbedding)
 
 # Set the page configurations
-st.set_page_config(page_title="​🎬  OctoAI Movie Bot - Demo",
+st.set_page_config(page_title="​🎬  OctoAI IMDbBot - Demo",
                    page_icon=":robot:")
 
 # Set up environment variables
@@ -146,7 +147,9 @@ def main():
     # Create the query engine
     query_engine = create_query_engine(index, llm_predictor)
     # Display the header
-    st.header("​🎬  Movie Bot - Demo")
+    st.header("​🎬  IMDbBot - Demo")
+    image = Image.open('octoml-octo-ai-logo-color.png')
+    st.image(image, caption='Powered by OctoAI Compute Service')
 
     try:
         # Get the user input
@@ -162,9 +165,10 @@ def main():
         # If there are generated messages, display them
         if st.session_state['generated']:
             for i in range(len(st.session_state['generated'])-1, -1, -1):
-                message(st.session_state["generated"][i], key=str(i))
                 message(st.session_state['past'][i],
                         is_user=True, key=f'{str(i)}_user')
+                message(st.session_state["generated"][i], key=str(i))
+
     except Exception as e:
         st.error("Something went wrong. Please try again.")
 
