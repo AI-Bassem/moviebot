@@ -93,12 +93,6 @@ class OctoAIEndpoint(LLM):
         # payload json
         parameter_payload = {"inputs": prompt, "parameters": _model_kwargs}
 
-        # HTTP headers for authorization
-        headers = {
-            "Authorization": f"Bearer {self.octoai_api_token}",
-            "Content-Type": "application/json",
-        }
-
         # send request using octaoai sdk
         try:
             octoai_client = client.Client(token=self.octoai_api_token)

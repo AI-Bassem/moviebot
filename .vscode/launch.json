@@ -13,7 +13,7 @@
         },
         "args": [
             "run",
-            "/Users/bassemyacoube/Documents/code/GitHub/moviebot/chatbot.py"
+            "chatbot.py"
         ],
         "jinja": true
     }

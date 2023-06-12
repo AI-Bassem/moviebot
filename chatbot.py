@@ -1,4 +1,5 @@
 # Libraries for file handling, logging, environment variable loading
+import dill
 import os
 from pathlib import Path
 import pickle
@@ -8,8 +9,9 @@ from streamlit_chat import message
 # Libraries for document loading, embeddings, AI agents and predictions
 from langchain.document_loaders.csv_loader import CSVLoader
 from langchain.agents import create_csv_agent
-from langchain.embeddings import HuggingFaceEmbeddings
+from langchain.embeddings.huggingface import HuggingFaceEmbeddings
 from octoai_endpoint import OctoAIEndpoint
+from octoai_embeddings import OctoAIEmbeddings
 from llama_index import (LLMPredictor, ServiceContext,
                          download_loader, GPTVectorStoreIndex, LangchainEmbedding)
 
@@ -70,13 +72,16 @@ llm_predictor = LLMPredictor(llm=llm)
 if 'embeddings' not in st.session_state:
     embeddings = LangchainEmbedding(
         HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2"))
+    embeddings1 = LangchainEmbedding(
+        OctoAIEmbeddings(endpoint_url="https://instruct-f1kzsig6xes9.octoai.cloud/predict"))
+    
     st.session_state['embeddings'] = embeddings
 else:
     embeddings = st.session_state['embeddings']
 # Create the ServiceContext
 if 'service_context' not in st.session_state:
     service_context = ServiceContext.from_defaults(
-        llm_predictor=llm_predictor, chunk_size_limit=256, embed_model=embeddings)
+        llm_predictor=llm_predictor, chunk_size_limit=400, embed_model=embeddings)
     st.session_state['service_context'] = service_context
 else:
     service_context = st.session_state['service_context']
@@ -85,11 +90,11 @@ else:
 if 'index' not in st.session_state:
     path = Path("index.pkl")
     if path.exists():
-       index= pickle.load(open(path, "rb"))
+       index= dill.load(open(path, "rb"))
     else:
         index = GPTVectorStoreIndex.from_documents(
             documents, service_context=service_context)
-        #pickle.dump(index, open(path, "wb")) https://github.com/jerryjliu/llama_index/issues/886
+        #dill.dump(index, open(path, "wb")) #https://github.com/jerryjliu/llama_index/issues/886
     st.session_state['index'] = index
 else:
     index = st.session_state['index']
@@ -124,32 +129,33 @@ def get_text(q_count):
         label=label, value=value, key="input", on_change=form_callback
     )
 
+try:
+    # User input
+    user_input = get_text(q_count=st.session_state['q_count'])
 
-# User input
-user_input = get_text(q_count=st.session_state['q_count'])
+    # If user input is not empty, process the input
+    if user_input and user_input.strip() != '':
+        output = query({
+            "inputs": {
+                #"past_user_inputs": st.session_state['past'],
+                #"generated_responses": st.session_state['generated'],
+                "text": user_input,
+            },
+        })
 
-# If user input is not empty, process the input
-if user_input and user_input.strip() != '':
-    output = query({
-        "inputs": {
-            "past_user_inputs": st.session_state['past'],
-            "generated_responses": st.session_state['generated'],
-            "text": user_input,
-        },
-        "parameters": {"": ""},
-    })
+        # Increment q_count, append user input and generated output to session state
+        try:
+            st.session_state['q_count'] += 1
+        except Exception:
+            st.session_state['q_count'] = 1
+        st.session_state['past'].append(user_input)
+        if output:
+            st.session_state['generated'].append(output)
 
-    # Increment q_count, append user input and generated output to session state
-    try:
-        st.session_state['q_count'] += 1
-    except Exception:
-        st.session_state['q_count'] = 1
-    st.session_state['past'].append(user_input)
-    if output:
-        st.session_state['generated'].append(output)
-
-# If there are generated messages, display them
-if st.session_state['generated']:
-    for i in range(len(st.session_state['generated'])-1, -1, -1):
-        message(st.session_state["generated"][i], key=str(i))
-        message(st.session_state['past'][i], is_user=True, key=f'{str(i)}_user')
+    # If there are generated messages, display them
+    if st.session_state['generated']:
+        for i in range(len(st.session_state['generated'])-1, -1, -1):
+            message(st.session_state["generated"][i], key=str(i))
+            message(st.session_state['past'][i], is_user=True, key=f'{str(i)}_user')
+except Exception as e:
+    st.error("Something went wrong. Please try again.")
