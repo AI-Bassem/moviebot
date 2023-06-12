@@ -1,12 +1,9 @@
-# Libraries for file handling, logging, environment variable loading
-import dill
+# Import the required libraries
 import os
-from pathlib import Path
-import pickle
-# Libraries for web application and HTTP requests
+import dill
 import streamlit as st
+from pathlib import Path
 from streamlit_chat import message
-# Libraries for document loading, embeddings, AI agents and predictions
 from langchain.document_loaders.csv_loader import CSVLoader
 from langchain.agents import create_csv_agent
 from langchain.embeddings.huggingface import HuggingFaceEmbeddings
@@ -15,147 +12,162 @@ from octoai_embeddings import OctoAIEmbeddings
 from llama_index import (LLMPredictor, ServiceContext,
                          download_loader, GPTVectorStoreIndex, LangchainEmbedding)
 
-# Load environment variables and set page configurations
-st.set_page_config(
-    page_title="​🎬  OctoAI Movie Bot - Demo",
-    page_icon=":robot:"
-)
-# Get the current file's directory
-current_dir = os.path.dirname(os.path.abspath(__file__))
-# Change the current working directory
-os.chdir(current_dir)
-# Set global variables
-os.environ["OCTOAI_API_TOKEN"] = st.secrets['OCTOAI_API_TOKEN']
-os.environ["ENDPOINT_URL"] = st.secrets['ENDPOINT_URL']
-endpoint_url = os.getenv("ENDPOINT_URL")
+# Set the page configurations
+st.set_page_config(page_title="​🎬  OctoAI Movie Bot - Demo",
+                   page_icon=":robot:")
 
-st.header("​🎬  Movie Bot - Demo")
+# Set up environment variables
 
-# Function to handle session state
+
+def setup_env_variables():
+    """Set up environment variables."""
+    os.environ["OCTOAI_API_TOKEN"] = st.secrets['OCTOAI_API_TOKEN']
+    os.environ["ENDPOINT_URL"] = st.secrets['ENDPOINT_URL']
+
+# Initialize session state
 
 
 def handle_session_state():
-    # Use session_state to manage data across reruns
-    if 'generated' not in st.session_state:
-        st.session_state['generated'] = []
+    """Initialize the session state if not already done."""
+    st.session_state.setdefault('generated', [])
+    st.session_state.setdefault('past', [])
+    st.session_state.setdefault('q_count', 0)
 
-    if 'past' not in st.session_state:
-        st.session_state['past'] = []
-
-    if 'q_count' not in st.session_state:
-        st.session_state['q_count'] = 0
+# Load movie data
 
 
-handle_session_state()
-
-# Load data from csv file
-file = Path('rotten_tomatoes_top_movies.csv')
-PagedCSVReader = download_loader("PagedCSVReader")
-loader = PagedCSVReader()
-documents = loader.load_data(file)
+def load_data(file_path):
+    """Load movie data from a CSV file."""
+    PagedCSVReader = download_loader("PagedCSVReader")
+    loader = PagedCSVReader()
+    return loader.load_data(file_path)
 
 # Initialize the OctoAiCloudLLM and LLMPredictor
-llm = OctoAIEndpoint(
-        endpoint_url=endpoint_url,
-        model_kwargs={
-            "max_new_tokens": 200,
-            "temperature": 0.75,
-            "top_p": 0.95,
-            "repetition_penalty": 1,
-            "seed": None,
-            "stop": [],
-        },
-    )
-llm_predictor = LLMPredictor(llm=llm)
 
-# Create the LangchainEmbedding
-if 'embeddings' not in st.session_state:
-    embeddings = LangchainEmbedding(
-        HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2"))
-    embeddings1 = LangchainEmbedding(
-        OctoAIEmbeddings(endpoint_url="https://instruct-f1kzsig6xes9.octoai.cloud/predict"))
-    
-    st.session_state['embeddings'] = embeddings
-else:
-    embeddings = st.session_state['embeddings']
-# Create the ServiceContext
-if 'service_context' not in st.session_state:
-    service_context = ServiceContext.from_defaults(
-        llm_predictor=llm_predictor, chunk_size_limit=400, embed_model=embeddings)
-    st.session_state['service_context'] = service_context
-else:
-    service_context = st.session_state['service_context']
 
-# Create the index from documents
-if 'index' not in st.session_state:
-    path = Path("index.pkl")
-    if path.exists():
-       index= dill.load(open(path, "rb"))
-    else:
-        index = GPTVectorStoreIndex.from_documents(
-            documents, service_context=service_context)
-        #dill.dump(index, open(path, "wb")) #https://github.com/jerryjliu/llama_index/issues/886
-    st.session_state['index'] = index
-else:
-    index = st.session_state['index']
+def initialize_llm(endpoint_url):
+    """Initialize the OctoAiCloudLLM and LLMPredictor."""
+    llm = OctoAIEndpoint(endpoint_url=endpoint_url, model_kwargs={
+                         "max_new_tokens": 200, "temperature": 0.75, "top_p": 0.95, "repetition_penalty": 1, "seed": None, "stop": [], })
+    return LLMPredictor(llm=llm)
 
-# Create the query engine
-if 'query_engine' not in st.session_state:
-    query_engine = index.as_query_engine(
-        verbose=True, llm_predictor=llm_predictor)
-    st.session_state['query_engine'] = query_engine
-else:
-    query_engine = st.session_state['query_engine']
-    
-    
-# Function to handle query
-def query(payload):
+# Create LangchainEmbedding
+
+
+def create_embeddings():
+    """Create and return LangchainEmbedding instance."""
+    if 'embeddings' not in st.session_state:
+        embeddings = LangchainEmbedding(
+            HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2"))
+        st.session_state['embeddings'] = embeddings
+    return st.session_state['embeddings']
+
+# Create ServiceContext
+
+
+def create_service_context(llm_predictor, embeddings):
+    """Create and return ServiceContext instance."""
+    if 'service_context' not in st.session_state:
+        service_context = ServiceContext.from_defaults(
+            llm_predictor=llm_predictor, chunk_size_limit=400, embed_model=embeddings)
+        st.session_state['service_context'] = service_context
+    return st.session_state['service_context']
+
+# Create Index
+
+
+def create_index(documents, service_context):
+    """Create and return GPTVectorStoreIndex instance."""
+    if 'index' not in st.session_state:
+        path = Path("index.pkl")
+        if path.exists():
+            index = dill.load(open(path, "rb"))
+        else:
+            index = GPTVectorStoreIndex.from_documents(
+                documents, service_context=service_context)
+            #dill.dump(index, open(path, "wb")) #https://github.com/jerryjliu/llama_index/issues/886
+        st.session_state['index'] = index
+    return st.session_state['index']
+
+# Create Query Engine
+
+
+def create_query_engine(index, llm_predictor):
+    """Create and return a query engine instance."""
+    if 'query_engine' not in st.session_state:
+        query_engine = index.as_query_engine(
+            verbose=True, llm_predictor=llm_predictor)
+        st.session_state['query_engine'] = query_engine
+    return st.session_state['query_engine']
+
+# Process Query
+
+
+def query(payload, query_engine):
+    """Process a query and return a response."""
     response = query_engine.query(payload["inputs"]["text"])
-    # Transform response to string and remove
-    response = str(response).lstrip("\n")
-    # leading newline character if present
-    return response
+    # Transform response to string and remove leading newline character if present
+    return str(response).lstrip("\n")
 
-# Function to handle form callback
- 
+# Handle Form Callback
+
+
 def form_callback():
+    """Handle the form callback."""
     st.session_state['input_value'] = st.session_state['input']
-    
+
+# Get Text
+
+
 def get_text(q_count):
-     
+    """Display a text input field on the UI and return the user's input."""
     label = "Type a question about a movie: "
     value = "Who directed the movie Jaws?\n"
-    return st.text_input(
-        label=label, value=value, key="input", on_change=form_callback
-    )
+    return st.text_input(label=label, value=value, key="input", on_change=form_callback)
 
-try:
-    # User input
-    user_input = get_text(q_count=st.session_state['q_count'])
 
-    # If user input is not empty, process the input
-    if user_input and user_input.strip() != '':
-        output = query({
-            "inputs": {
-                #"past_user_inputs": st.session_state['past'],
-                #"generated_responses": st.session_state['generated'],
-                "text": user_input,
-            },
-        })
+def main():
+    # Setup the environment variables
+    setup_env_variables()
+    # Set the endpoint url
+    endpoint_url = os.getenv("ENDPOINT_URL")
+    # Initialize the session state
+    handle_session_state()
+    # Load the data
+    documents = load_data(Path('rotten_tomatoes_top_movies.csv'))
+    # Initialize the LLM predictor
+    llm_predictor = initialize_llm(endpoint_url)
+    # Create the embeddings
+    embeddings = create_embeddings()
+    # Create the service context
+    service_context = create_service_context(llm_predictor, embeddings)
+    # Create the index
+    index = create_index(documents, service_context)
+    # Create the query engine
+    query_engine = create_query_engine(index, llm_predictor)
+    # Display the header
+    st.header("​🎬  Movie Bot - Demo")
 
-        # Increment q_count, append user input and generated output to session state
-        try:
+    try:
+        # Get the user input
+        user_input = get_text(q_count=st.session_state['q_count'])
+        # If user input is not empty, process the input
+        if user_input and user_input.strip() != '':
+            output = query({"inputs": {"text": user_input, }}, query_engine)
+            # Increment q_count, append user input and generated output to session state
             st.session_state['q_count'] += 1
-        except Exception:
-            st.session_state['q_count'] = 1
-        st.session_state['past'].append(user_input)
-        if output:
-            st.session_state['generated'].append(output)
+            st.session_state['past'].append(user_input)
+            if output:
+                st.session_state['generated'].append(output)
+        # If there are generated messages, display them
+        if st.session_state['generated']:
+            for i in range(len(st.session_state['generated'])-1, -1, -1):
+                message(st.session_state["generated"][i], key=str(i))
+                message(st.session_state['past'][i],
+                        is_user=True, key=f'{str(i)}_user')
+    except Exception as e:
+        st.error("Something went wrong. Please try again.")
 
-    # If there are generated messages, display them
-    if st.session_state['generated']:
-        for i in range(len(st.session_state['generated'])-1, -1, -1):
-            message(st.session_state["generated"][i], key=str(i))
-            message(st.session_state['past'][i], is_user=True, key=f'{str(i)}_user')
-except Exception as e:
-    st.error("Something went wrong. Please try again.")
+
+if __name__ == "__main__":
+    main()
