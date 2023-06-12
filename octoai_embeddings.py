@@ -45,30 +45,35 @@ class OctoAIEmbeddings(BaseModel, Embeddings):
     def _identifying_params(self) -> Mapping[str, Any]:
         """Return the identifying parameters."""
         return {"endpoint_url": self.endpoint_url, "model_kwargs": self.model_kwargs or {}}
-
-    def _compute_embeddings(self, text: List[str], instruction: str) -> List[List[float]]:
+   
+    def _compute_embeddings(self, texts: List[str], instruction: str) -> List[List[float]]:
         """Common functionality for compute embeddings using a OctoAI instruct model."""
-        parameter_payload = {
-            "sentence": str([[item] for item in text]),
-            "instruction": str([[instruction] for item in text]),
-            "parameters": self.model_kwargs or {}
-        }
+        embeddings = []
+        octoai_client = client.Client(token=self.octoai_api_token)
 
-        try:
-            octoai_client = client.Client(token=self.octoai_api_token)
-            resp_json = octoai_client.infer(
-                self.endpoint_url, parameter_payload)
-            embeddings = resp_json["embeddings"]
-        except Exception as e:
-            raise ValueError(
-                f"Error raised by the inference endpoint: {e}") from e
+        for text in texts:
+            parameter_payload = {
+                "sentence": str([text]),# for item in text]),
+                "instruction": str([instruction]),# for item in text]),
+                "parameters": self.model_kwargs or {}
+            }
 
+            try:
+                resp_json = octoai_client.infer(
+                    self.endpoint_url, parameter_payload)
+                embedding = resp_json["embeddings"]
+            except Exception as e:
+                raise ValueError(
+                    f"Error raised by the inference endpoint: {e}") from e
+            
+            embeddings.append(embedding)
+            
         return embeddings
-
+    
     def embed_documents(self, texts: List[str]) -> List[List[float]]:
         """Compute document embeddings using an OctoAI instruct model."""
         texts = list(map(lambda x: x.replace("\n", " "), texts))
-        return [self._compute_embeddings(texts, self.embed_instruction)]
+        return self._compute_embeddings(texts, self.embed_instruction)
 
     def embed_query(self, text: str) -> List[float]:
         """Compute query embedding using an OctoAI instruct model."""
