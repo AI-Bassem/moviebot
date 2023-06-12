@@ -10,3 +10,4 @@ sentence-transformers
 octoai
 transformers
 huggingface
+dill
