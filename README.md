@@ -44,4 +44,4 @@ This app uses the OctoAI Cloud LLM API to get responses from a large language mo
 
 - Responses from the OctoAI API are displayed in the Streamlit chat interface
 
-The full code and components used are available in `chatbot.py`. Please let me know if you have any questions!
+The app code and components used are available in `chatbot.py`. The live demo is at https://octoai-moviebot.streamlit.app/. Please let me know if you have any questions!
