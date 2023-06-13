@@ -12,7 +12,7 @@
 
 ## How to run
 
-1\. Clone this repo
+1\. Clone this repo and run `pip install -r requirements.txt`
 
 2\. Obtain an OctoAI API access token and endpoint URL
 
