@@ -14,7 +14,7 @@
 
 1\. Clone this repo and run `pip install -r requirements.txt`
 
-2\. Obtain an OctoAI API access token and endpoint URL
+2\. Obtain an OctoAI API access token and MPT-7B endpoint URL from https://octoai.cloud
 
 3\. Add the access token and endpoint URL as Streamlit secrets named `OCTOAI_API_TOKEN` and `ENDPOINT_URL` respectively
 
