@@ -1,7 +1,6 @@
 # Import the required libraries
 import os
 import dill
-import Image
 import streamlit as st
 from pathlib import Path
 from streamlit_chat import message
@@ -14,7 +13,7 @@ from llama_index import (LLMPredictor, ServiceContext,
                          download_loader, GPTVectorStoreIndex, LangchainEmbedding)
 
 # Set the page configurations
-st.set_page_config(page_title="​🎬  OctoAI IMDbBot - Demo",
+st.set_page_config(page_title="​🎬  IMDBot - Powered by OctoAI",
                    page_icon=":robot:")
 
 # Set up environment variables
@@ -147,9 +146,13 @@ def main():
     # Create the query engine
     query_engine = create_query_engine(index, llm_predictor)
     # Display the header
-    st.header("​🎬  IMDbBot - Demo")
-    image = Image.open('octoml-octo-ai-logo-color.png')
-    st.image(image, caption='Powered by OctoAI Compute Service')
+    st.header("​🎬  IMDBot - Powered by OctoAI")
+    st.markdown("* Try OctoML's new compute service for free by signing up for early access: https://octoml.ai/")
+    st.markdown('* IMDBot is great at answering factual questions like: "Who starred in the Harry Potter movies?" or "What year did Jaws come out?')
+    st.markdown('* IMDBot loves the word "synopsis" -- we suggest using it if you are looking for plot summaries. Otherwise, expect some hallucinations.')
+    st.markdown("* IMDbot has information about 500 popular movies, but is not comprehensive. It probably won't know some more obscure films.")
+
+    st.sidebar.image("octoml-octo-ai-logo-color.png", caption='Powered by OctoAI Compute Service')
 
     try:
         # Get the user input
