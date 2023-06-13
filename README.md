@@ -34,11 +34,13 @@
 
 This app uses the OctoAI Cloud LLM API to get responses from a large language model trained on movie data. Specifically:
 
-- Movie data from Rotten Tomatoes is loaded as documents
+- Movie data from Rotten Tomatoes Top Movies dataset is loaded as documents from the .csv file
 
-- These documents are indexed using an LLMPredictor and GPTVectorStoreIndex
+- These documents are indexed using an OctoAI Embeddings endpoint running Instructor-Large model and GPTVectorStoreIndex from llama_index package
 
-- User inputs are queried against this index using a QueryEngine  
+- User inputs are queried against this index using QueryEngine from llama_index
+
+- The relevant text from the index is then sent to the OctoAI LLM endpoint using langchain
 
 - Responses from the OctoAI API are displayed in the Streamlit chat interface
 
