@@ -24,7 +24,6 @@ This walkthrough assumes you already have some basic familiarity with the OctoAI
 3. Activate conda environment with `conda activate moviebotapp`.
 
 # 🧑‍💻 Step 3: Build the MovieBot Application
-Like before, we will be using Streamlit to run our chat application. The code for this application is in the `/moviebot` folder of this repo. 
 * Clone this repo to your local machine using `git clone`.
 * Install application dependencies with `pip install -r requirements.txt`.
 * Create a new `OCTOAI_API_TOKEN`. You can create new keys under "Settings" (the gear icon to the left) in the OctoAI dashboard.
