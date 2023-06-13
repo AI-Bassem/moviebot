@@ -18,18 +18,19 @@ This walkthrough assumes you already have some basic familiarity with the OctoAI
 * When you're ready to build your own production-grade chatbot, click the `Clone` button below the cURL Example to create a new endpoint from this template.
 * Copy the `Endpoint URL`
 
-# 🧑‍💻 Step 2: Build the MovieBot Application
+# 💻 Step 2: Create a New Virtual Environment & Install Streamlit
+1. Install the appropriate version of [Miniconda](https://docs.conda.io/en/latest/miniconda.html) for your OS.
+2. From the terminal, create a conda environment using `conda create --name moviebotapp`.
+3. Activate conda environment with `conda activate moviebotapp`.
+
+# 🧑‍💻 Step 3: Build the MovieBot Application
 Like before, we will be using Streamlit to run our chat application. The code for this application is in the `/moviebot` folder of this repo. 
-* Clone this repo to your local machine using `git clone`. 
+* Clone this repo to your local machine using `git clone`.
+* Install application dependencies with `pip install -r requirements.txt`.
 * Create a new `OCTOAI_API_TOKEN`. You can create new keys under "Settings" (the gear icon to the left) in the OctoAI dashboard.
 * Be sure your `OCTOAI_API_TOKEN` is set in your '/.streamlit/secrets.toml' file as `OCTOAI_API_TOKEN="<paste token here>"`
 * Add your ENDPOINT_URL to the '/.streamlit/secrets.toml' file as `ENDPOINT_URL="<paste url here>"`. 
 
-# 💻 Step 3: Create a New Virtual Environment & Install Streamlit
-1. Install the appropriate version of [Miniconda](https://docs.conda.io/en/latest/miniconda.html) for your OS.
-2. From the terminal, create a conda environment using `conda create --name moviebotapp`.
-3. Activate conda environment with `conda activate moviebotapp`.
-4. Install application dependencies with `pip install -r requirements.txt`.
 
 
 # 🚢 Step 3: Deploy and run the MovieBot App
