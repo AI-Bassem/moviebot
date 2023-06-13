@@ -146,13 +146,12 @@ def main():
     # Create the query engine
     query_engine = create_query_engine(index, llm_predictor)
     # Display the header
-    st.header("​🎬  IMDBot - Powered by OctoAI")
-    st.markdown("* Try OctoML's new compute service for free by signing up for early access: https://octoml.ai/")
-    st.markdown('* IMDBot is great at answering factual questions like: "Who starred in the Harry Potter movies?" or "What year did Jaws come out?')
-    st.markdown('* IMDBot loves the word "synopsis" -- we suggest using it if you are looking for plot summaries. Otherwise, expect some hallucinations.')
-    st.markdown("* IMDbot has information about 500 popular movies, but is not comprehensive. It probably won't know some more obscure films.")
-
-    st.sidebar.image("octoml-octo-ai-logo-color.png", caption='Powered by OctoAI Compute Service')
+    st.subheader("​🎬  IMDBot - Powered by OctoAI")
+    st.markdown("Try OctoML's new compute service for free by signing up for early access: https://octoml.ai/")
+    st.markdown(' * IMDBot is great at answering factual questions like: "Who starred in the Harry Potter movies?" or "What year did Jaws come out?')
+    st.markdown(' * IMDBot loves the word "synopsis" -- we suggest using it if you are looking for plot summaries. Otherwise, expect some hallucinations.')
+    st.markdown(" * IMDbot has information about 500 popular movies, but is not comprehensive. It probably won't know some more obscure films.")
+    st.sidebar.image("octoml-octo-ai-logo-color.png")#, caption='Powered by OctoAI Compute Service')
 
     try:
         # Get the user input
