@@ -6,8 +6,6 @@ llama_index
 pydantic
 python-dotenv
 Requests
-sentence-transformers
-octoai
+octoai-sdk
 transformers
-huggingface
 dill
