@@ -13,16 +13,9 @@ from llama_index import (LLMPredictor, ServiceContext,
 st.set_page_config(page_title="​🎬  IMDBot - Powered by OctoAI",
                    page_icon=":robot:")
 
-# Set up environment variables
 
-
-def setup_env_variables():
-    """Set up environment variables."""
-    os.environ["OCTOAI_API_TOKEN"] = st.secrets['OCTOAI_API_TOKEN']
-    os.environ["ENDPOINT_URL"] = st.secrets['ENDPOINT_URL']
 
 # Initialize session state
-
 
 def handle_session_state():
     """Initialize the session state if not already done."""
@@ -30,8 +23,16 @@ def handle_session_state():
     st.session_state.setdefault('past', [])
     st.session_state.setdefault('q_count', 0)
 
-# Load movie data
 
+# Set up environment variables
+
+def setup_env_variables():
+    """Set up environment variables."""
+    os.environ["OCTOAI_API_TOKEN"] = st.secrets['OCTOAI_API_TOKEN']
+    os.environ["ENDPOINT_URL"] = st.secrets['ENDPOINT_URL']
+
+
+# Load movie data
 
 def load_data(file_path):
     """Load movie data from a CSV file."""
@@ -39,8 +40,8 @@ def load_data(file_path):
     loader = PagedCSVReader()
     return loader.load_data(file_path)
 
-# Initialize the OctoAiCloudLLM and LLMPredictor
 
+# Initialize the OctoAiCloudLLM and LLMPredictor
 
 def initialize_llm(endpoint_url):
     """Initialize the OctoAiCloudLLM and LLMPredictor."""
@@ -48,8 +49,8 @@ def initialize_llm(endpoint_url):
                          "max_new_tokens": 200, "temperature": 0.75, "top_p": 0.95, "repetition_penalty": 1, "seed": None, "stop": [], })
     return LLMPredictor(llm=llm)
 
-# Create LangchainEmbedding
 
+# Create LangchainEmbedding
 
 def create_embeddings():
     """Create and return LangchainEmbedding instance."""
@@ -124,6 +125,13 @@ def get_text(q_count):
 
 
 def main():
+    
+    st.subheader("​🎬  IMDBot - Powered by OctoAI")
+    st.markdown('* :movie_camera: Tip #1: IMDBot is great at answering factual questions like: "Who starred in the Harry Potter movies?" or "What year did Jaws come out?')
+    st.markdown('* :black_nib: Tip #2: IMDBot loves the word "synopsis" -- we suggest using it if you are looking for plot summaries. Otherwise, expect some hallucinations.')
+    st.markdown("* :blush: Tip #3: IMDbot has information about 500 popular movies, but is not comprehensive. It probably won't know some more obscure films.")
+    st.markdown("### Welcome to the IMDBot demo")
+    st.sidebar.image("octoml-octo-ai-logo-color.png", caption="Try OctoML's new compute service for free by signing up for early access: https://octoml.ai/")
     # Setup the environment variables
     setup_env_variables()
     # Set the endpoint url
@@ -143,13 +151,6 @@ def main():
     # Create the query engine
     query_engine = create_query_engine(index, llm_predictor)
     # Display the header
-    st.subheader("​🎬  IMDBot - Powered by OctoAI")
-    st.markdown('* :movie_camera: Tip #1: IMDBot is great at answering factual questions like: "Who starred in the Harry Potter movies?" or "What year did Jaws come out?')
-    st.markdown('* :black_nib: Tip #2: IMDBot loves the word "synopsis" -- we suggest using it if you are looking for plot summaries. Otherwise, expect some hallucinations.')
-    st.markdown("* :blush: Tip #3: IMDbot has information about 500 popular movies, but is not comprehensive. It probably won't know some more obscure films.")
-    st.markdown("### Welcome to the IMDBot demo")
-    st.sidebar.image("octoml-octo-ai-logo-color.png", caption="Try OctoML's new compute service for free by signing up for early access: https://octoml.ai/")
-
     try:
         # Get the user input
         user_input = get_text(q_count=st.session_state['q_count'])
