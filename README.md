@@ -1,3 +1,68 @@
+
+ReadMe
+octoai
+v0.1.0-beta
+Home
+DEVELOPER DASHBOARD
+My Developers
+PROJECT
+Metrics
+Configuration
+Appearance
+Owlbot AI
+BETA
+Versions
+Suggested Edits
+DOCUMENTATION
+Landing Page
+Guides
+Recipes
+API Reference
+Changelog
+Custom Pages
+Getting Started
+Welcome to the OctoAI compute service! 🐙
+Installation Links
+Hardware & Pricing
+CLI
+Running Inferences on OctoAI endpoints
+Use the Python Client for Templates
+Running custom models on OctoAI
+Build a custom endpoint from Python code with our CLI
+Create a custom endpoint from an existing container
+Pulling containers from a private registry
+Setting up secrets or environment variables for your custom endpoints
+Advanced: Build a Container from Scratch in Python
+LLM Q&A applications using LangChain and LlamaIndex
+Code walkthrough: Python wrapper for LangChain
+Setup steps for the Q&A app
+Code walkthrough: generic chat app
+Code walkthrough: Q&A on a custom PDF
+Jupyter notebook example
+Building a Moviebot Chat App
+Code walkthrough: csv file chat app
+Jupyter notebook example [DRAFT]
+How to Create an OctoAI API Token
+FAQs
+Core Concepts
+Cold Start
+Privacy and Security
+Service Regions
+Service Reliability
+Can my container learn which tier of hardware it's running on?
+Autoscaling down from multiple active replicas
+INSTALLATION
+CLI Releases
+
+Guides
+
+
+
+NEW CATEGORY
+
+Building a Moviebot Chat App
+Steps to build and run a sample Movie Bot app
+
 In this tutorial, we'll build a chat app that lets a user ask questions about [Rotten Tomatoes Top Movies Dataset](https://www.kaggle.com/datasets/thedevastator/rotten-tomatoes-top-movies-ratings-and-technical).
 
 # Preliminaries
@@ -12,22 +77,22 @@ This walkthrough assumes you already have some basic familiarity with the OctoAI
   - [LlamaIndex](https://gpt-index.readthedocs.io/en/latest/): A "data framework" for LLMs that allows us to do things like connect to documents and databases, structure our data for LLMs, run queries, and integrate with popular applications and frameworks.
   - [Langhchain](https://python.langchain.com/en/latest/index.html): A popular library for building LLM applications, Langchain extends LLM capabilities through the use of constructs called `Agents` and `Chains`. Used in concert, these constructs allow us to build more complex applications that can be deployed to production.
 
-# 🧑‍💻 Step 1: Create a new OctoAI Endpoint from a Template
+# 🧑‍💻 Step 1: Create a new OctoAI Endpoint from a Template
 
 - Go to [OctoAI](https://octoai.cloud/), click `Endpoints`, and select "Chatbot (Research-Only)" from the template cards to use the [mpt-7b-demo](https://octoai.cloud/templates/mpt-7b-demo) template.
 - You can experiment with the conversational outputs of this LLM by typing a prompt into the `Prompt1` field and clicking `Generate`.
 - When you're ready to build your own production-grade chatbot, click the `Clone` button below the cURL Example to create a new endpoint from this template.
 - Copy the `Endpoint URL`
 
-# 💻 Step 2: Create a New Virtual Environment & Install Streamlit
+# 💻 Step 2: Create a New Virtual Environment & Install Streamlit
 
 1. Install the appropriate version of [Miniconda](https://docs.conda.io/en/latest/miniconda.html) for your OS.
 2. From the terminal, create a conda environment using the`conda create --name moviebotapp`.
 3. Activate the conda environment with `conda activate moviebotapp`.
 
-# 🧑‍💻 Step 3: Build the MovieBot Application
+# 🧑‍💻 Step 3: Build the MovieBot Application
 
-Like before, we will be using Streamlit to run our chat application. The code for this application is in the `/moviebot` folder of this repo. 
+Like before, we will be using Streamlit to run our chat application. The code for this application is in the `moviebot` [repo](https://github.com/AI-Bassem/moviebot). 
 
 - Clone this repo to your local machine using the`git clone`.
 - Install application dependencies with `pip install -r requirements.txt`.
@@ -35,7 +100,7 @@ Like before, we will be using Streamlit to run our chat application. The code fo
 - Be sure your `OCTOAI_API_TOKEN` is set in your `'/.streamlit/secrets.toml'`file as `OCTOAI_API_TOKEN="<paste token here>"`
 - Add your ENDPOINT_URL to the '`/.streamlit/secrets.toml'`file as `ENDPOINT_URL="<paste url here>"`. 
 
-# 🚢 Step 4: Deploy and run the MovieBot App
+# 🚢 Step 4: Deploy and run the MovieBot App
 
 Now that you have built your application, you can deploy it locally within your conda environment using the pre-built script that we’ve provided. Here’s how:
 
@@ -54,3 +119,8 @@ Now that you have built your application, you can deploy it locally within your 
 - User inputs are queried against this index using QueryEngine from LlamaIndex. 
 - The relevant text from the index is then sent to the OctoAI LLM endpoint using langchain. 
 - Responses from the OctoAI API are displayed in the Streamlit chat interface
+WHAT’S NEXT
+Tell your users what they should do after they've finished this page
+Code walkthrough: csv file chat app
+
+
