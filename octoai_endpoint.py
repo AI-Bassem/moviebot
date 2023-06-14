@@ -27,7 +27,7 @@ class OctoAIEndpoint(LLM):
             )
             endpoint = OctoAIEndpoint(
                 endpoint_url=endpoint_url,
-                octoai_api_token="octoai-api-key"
+                octoai_api_token="octoai-api-token"
             )
     """
 

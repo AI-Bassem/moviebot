@@ -53,8 +53,8 @@ class OctoAIEmbeddings(BaseModel, Embeddings):
 
         for text in texts:
             parameter_payload = {
-                "sentence": str([text]),# for item in text]),
-                "instruction": str([instruction]),# for item in text]),
+                "sentence": str([text]),
+                "instruction": str([instruction]),
                 "parameters": self.model_kwargs or {}
             }
 
