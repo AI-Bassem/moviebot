@@ -73,7 +73,6 @@ def create_service_context(llm_predictor, embeddings):
 
 # Create Index
 
-
 def create_index(documents, service_context):
     """Create and return GPTVectorStoreIndex instance."""
     if 'index' not in st.session_state:
@@ -88,7 +87,6 @@ def create_index(documents, service_context):
     return st.session_state['index']
 
 # Create Query Engine
-
 
 def create_query_engine(index, llm_predictor):
     """Create and return a query engine instance."""
