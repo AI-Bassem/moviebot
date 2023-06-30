@@ -1,11 +1,10 @@
 # Import the required libraries
 import os
-import dill
 import streamlit as st
 from pathlib import Path
 from streamlit_chat import message
-from octoai_endpoint import OctoAIEndpoint
-from octoai_embeddings import OctoAIEmbeddings
+from langchain.llms.octoai_endpoint import OctoAIEndpoint
+from langchain.embeddings.octoai_embeddings import OctoAIEmbeddings
 from llama_index import (LLMPredictor, ServiceContext,
                          download_loader, GPTVectorStoreIndex, LangchainEmbedding)
 
