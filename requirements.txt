@@ -9,3 +9,4 @@ Requests
 octoai-sdk
 transformers
 dill
+octoai-sdk
