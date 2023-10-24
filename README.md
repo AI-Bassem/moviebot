@@ -5,7 +5,7 @@ In this tutorial, we'll build a chat app that lets a user ask questions about [R
 This walkthrough assumes you already have some basic familiarity with the OctoAI Compute Service. If you haven't already read the [Getting Started](https://docs.octoai.cloud/docs/getting-started) section of our docs, we highly recommend you do so now. If this is your first time building an end-to-end Generative AI application, check out the Stable Diffusion example.
 
 - [OctoAI compute service](https://octoai.cloud/): The OctoAI compute service provides fast and simple Machine Learning inference capability for us. In general, it can turn any container or Python code into a production-grade endpoint in minutes.
-- [MPT-7B ](https://huggingface.co/mosaicml/mpt-7b): This is the open-source transformer model at the heart of our chat app. 
+- [LLama2-7B ](https://huggingface.co/meta-llama/Llama-2-7b): This is the open-source transformer model at the heart of our chat app. 
 - [Streamlit](https://github.com/streamlit): A tool for building lightweight, beautiful, and shareable Python-based web applications.
 - [Miniconda](https://docs.conda.io/en/latest/miniconda.html): A useful package and environment manager that includes both Python and pip out of the box. The standard Python distribution includes each of the following libraries that we’ll leverage in our application:
   - [Requests](https://requests.readthedocs.io/en/latest/): Allows us to send and receive HTTP requests and responses using Python code. We use this library to make it easy to access the OctoML compute service; we simply provide some basic information including the URL and the stable diffusion parameters that we want to send.
@@ -14,7 +14,7 @@ This walkthrough assumes you already have some basic familiarity with the OctoAI
 
 # 🧑‍💻 Step 1: Create a new OctoAI Endpoint from a Template
 
-- Go to [OctoAI](https://octoai.cloud/), click `Endpoints`, and select "Chatbot (Research-Only)" from the template cards to use the [mpt-7b-demo](https://octoai.cloud/templates/mpt-7b-demo) template.
+- Go to [OctoAI](https://octoai.cloud/), click `Endpoints`, and select "Chatbot (Research-Only)" from the template cards to use the [Llama-2-7b-demo](https://octoai.cloud/models/llama-2-7b-chat-demo) template.
 - You can experiment with the conversational outputs of this LLM by typing a prompt into the `Prompt1` field and clicking `Generate`.
 - When you're ready to build your own production-grade chatbot, click the `Clone` button below the cURL Example to create a new endpoint from this template.
 - Copy the `Endpoint URL`
