@@ -29,7 +29,7 @@ Like before, we will be using Streamlit to run our chat application. The code fo
 - Be sure your `OCTOAI_API_TOKEN` is set in your `'/.streamlit/secrets.toml'`file as `OCTOAI_API_TOKEN="<paste token here>"`
 - Add your ENDPOINT_URL to the '`/.streamlit/secrets.toml'`file as `ENDPOINT_URL="<paste url here>"`. 
 
-# 🚢 Step 4: Deploy and run the MovieBot App
+# Deploy and run the MovieBot App
 
 Now that you have built your application, you can deploy it locally within your conda environment using the pre-built script that we’ve provided. Here’s how:
 
