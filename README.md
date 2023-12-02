@@ -12,20 +12,14 @@ This walkthrough assumes you already have some basic familiarity with the OctoAI
   - [LlamaIndex](https://gpt-index.readthedocs.io/en/latest/): A "data framework" for LLMs that allows us to do things like connect to documents and databases, structure our data for LLMs, run queries, and integrate with popular applications and frameworks.
   - [Langhchain](https://python.langchain.com/en/latest/index.html): A popular library for building LLM applications, Langchain extends LLM capabilities through the use of constructs called `Agents` and `Chains`. Used in concert, these constructs allow us to build more complex applications that can be deployed to production.
 
-# 🧑‍💻 Step 1: Create a new OctoAI Endpoint from a Template
 
-- Go to [OctoAI](https://octoai.cloud/), click `Endpoints`, and select "Chatbot (Research-Only)" from the template cards to use the [Llama-2-7b-demo](https://octoai.cloud/models/llama-2-7b-chat-demo) template.
-- You can experiment with the conversational outputs of this LLM by typing a prompt into the `Prompt1` field and clicking `Generate`.
-- When you're ready to build your own production-grade chatbot, click the `Clone` button below the cURL Example to create a new endpoint from this template.
-- Copy the `Endpoint URL`
-
-# 💻 Step 2: Create a New Virtual Environment & Install Streamlit
+# 💻  Create a New Virtual Environment & Install Streamlit
 
 1. Install the appropriate version of [Miniconda](https://docs.conda.io/en/latest/miniconda.html) for your OS.
 2. From the terminal, create a conda environment using the`conda create --name moviebotapp`.
 3. Activate the conda environment with `conda activate moviebotapp`.
 
-# 🧑‍💻 Step 3: Build the MovieBot Application
+# 🧑‍💻 Build the MovieBot Application
 
 Like before, we will be using Streamlit to run our chat application. The code for this application is in the `moviebot` [repo](https://github.com/AI-Bassem/moviebot). 
 
