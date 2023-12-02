@@ -40,7 +40,7 @@ def setup_env_variables():
     os.environ["ENDPOINT_URL"] = (
         st.secrets["ENDPOINT_URL"]
         if (st.secrets["ENDPOINT_URL"] is not None and st.secrets["ENDPOINT_URL"]!="")
-        else "https://llama-2-7b-chat-demo-kk0powt97tmb.octoai.run/v1/chat/completions"
+        else "https://text.octoai.run/v1/chat/completions"
     )
 
 
@@ -62,7 +62,7 @@ def initialize_llm(endpoint_url):
     llm = OctoAIEndpoint(
         endpoint_url=endpoint_url,
         model_kwargs={
-            "model": "llama-2-7b-chat",
+            "model": "llama-2-7b-chat-fp16",
             "messages": [
                 {
                     "role": "system",
