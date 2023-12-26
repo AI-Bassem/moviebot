@@ -1,18 +1,18 @@
 # Import the required libraries
 import os
-import dill
+import pickle
 import streamlit as st
 from pathlib import Path
 from streamlit_chat import message
 from langchain.llms.octoai_endpoint import OctoAIEndpoint
 from langchain.embeddings.octoai_embeddings import OctoAIEmbeddings
-from llama_index import (
-    LLMPredictor,
-    ServiceContext,
-    download_loader,
-    GPTVectorStoreIndex,
-    LangchainEmbedding,
-)
+from langchain.document_loaders.csv_loader import CSVLoader
+from langchain.vectorstores.faiss import FAISS
+from operator import itemgetter
+
+from langchain.prompts import ChatPromptTemplate
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.runnables import RunnableLambda, RunnablePassthrough
 
 # Set the page configurations
 st.set_page_config(page_title="​🎬  IMDBot - Powered by OctoAI", page_icon=":robot:")
@@ -30,18 +30,16 @@ def handle_session_state():
 
 # Set up environment variables
 
+
 def setup_env_variables():
     """Set up environment variables."""
-    os.environ["OCTOAI_API_TOKEN"] = (
-        st.secrets["OCTOAI_API_TOKEN"]
-        if (st.secrets["OCTOAI_API_TOKEN"] is not None and st.secrets["OCTOAI_API_TOKEN"]!="")
-        else "<OCTOAI_API_TOKEN>"
+    OCTOAI_API_TOKEN = st.secrets.get("OCTOAI_API_TOKEN", "")
+    os.environ["OCTOAI_API_TOKEN"] = OCTOAI_API_TOKEN
+
+    ENDPOINT_URL = st.secrets.get(
+        "ENDPOINT_URL", "https://text.octoai.run/v1/chat/completions"
     )
-    os.environ["ENDPOINT_URL"] = (
-        st.secrets["ENDPOINT_URL"]
-        if (st.secrets["ENDPOINT_URL"] is not None and st.secrets["ENDPOINT_URL"]!="")
-        else "https://text.octoai.run/v1/chat/completions"
-    )
+    os.environ["ENDPOINT_URL"] = ENDPOINT_URL
 
 
 # Load movie data
@@ -49,9 +47,10 @@ def setup_env_variables():
 
 def load_data(file_path):
     """Load movie data from a CSV file."""
-    PagedCSVReader = download_loader("PagedCSVReader")
-    loader = PagedCSVReader()
-    return loader.load_data(file_path)
+    loader = CSVLoader(
+        file_path=file_path, encoding="utf-8", csv_args={"delimiter": ","}
+    )
+    return loader.load()
 
 
 # Initialize the OctoAiCloudLLM and LLMPredictor
@@ -62,7 +61,7 @@ def initialize_llm(endpoint_url):
     llm = OctoAIEndpoint(
         endpoint_url=endpoint_url,
         model_kwargs={
-            "model": "llama-2-7b-chat-fp16",
+            "model": "llama-2-13b-chat-fp16",
             "messages": [
                 {
                     "role": "system",
@@ -73,72 +72,83 @@ def initialize_llm(endpoint_url):
             "max_tokens": 256,
         },
     )
-    return LLMPredictor(llm=llm)
+
+    return llm  # llms.LangChainLLM(llm=llm)
 
 
 # Create LangchainEmbedding
 
 
-def create_embeddings():
+def create_embedding(documents):
     """Create and return LangchainEmbedding instance."""
     if "embeddings" not in st.session_state:
-        embeddings = LangchainEmbedding(
-            OctoAIEmbeddings(
-                endpoint_url="https://instructor-large-f1kzsig6xes9.octoai.run/predict"
-            )
+        octo_embed = OctoAIEmbeddings(
+            octoai_api_token=os.environ["OCTOAI_API_TOKEN"],
+            endpoint_url="https://instructor-large-f1kzsig6xes9.octoai.run/predict",
         )
-        st.session_state["embeddings"] = embeddings
-    return st.session_state["embeddings"]
-
-
-# Create ServiceContext
-
-
-def create_service_context(llm_predictor, embeddings):
-    """Create and return ServiceContext instance."""
-    if "service_context" not in st.session_state:
-        service_context = ServiceContext.from_defaults(
-            llm_predictor=llm_predictor, chunk_size_limit=400, embed_model=embeddings
-        )
-        st.session_state["service_context"] = service_context
-    return st.session_state["service_context"]
-
+        st.session_state["embeddings"] = octo_embed
+    return st.session_state["embeddings"] 
 
 # Create Index
 
 
-def create_index(documents, service_context):
-    """Create and return GPTVectorStoreIndex instance."""
+def create_index(documents, embedding):
+    """Create and return db store."""
     if "index" not in st.session_state:
         path = Path("index.pkl")
         if path.exists():
-            index = dill.load(open(path, "rb"))
+            index = pickle.load(open(path, "rb"))
         else:
-            index = GPTVectorStoreIndex.from_documents(
-                documents, service_context=service_context
+            
+            index = FAISS.from_documents(
+                documents,
+                embedding,
             )
-            #dill.dump(index, open(path, "wb"))  # https://github.com/jerryjliu/llama_index/issues/886
+
+            pickle.dump(
+                index, open(path, "wb")
+            )
         st.session_state["index"] = index
     return st.session_state["index"]
 
 
 # Create Query Engine
+from llama_index import indices, query_engine, response_synthesizers, retrievers
 
 
-def create_query_engine(index, llm_predictor):
+def create_query_engine(index):
     """Create and return a query engine instance."""
+
     if "query_engine" not in st.session_state:
-        query_engine = index.as_query_engine(verbose=True, llm_predictor=llm_predictor)
-        st.session_state["query_engine"] = query_engine
+        retriever = index.as_retriever()
+        st.session_state["query_engine"] = retriever
     return st.session_state["query_engine"]
 
 
 # Process Query
 
 
-def query(payload, query_engine):
+def query(payload, llm, retriever):
     """Process a query and return a response."""
-    response = query_engine.query(payload["inputs"]["text"])
+    query = payload["inputs"]["text"]
+
+    template = """Answer the question based only on the following context:
+    {context}
+
+    Question: {question}
+    """
+    prompt = ChatPromptTemplate.from_template(template)
+
+    model = llm
+
+    chain = (
+        {"context": retriever, "question": RunnablePassthrough()}
+        | prompt
+        | model
+        | StrOutputParser()
+    )
+
+    response = chain.invoke(query)
     # Transform response to string and remove leading newline character if present
     return str(response).lstrip("\n")
 
@@ -161,6 +171,9 @@ def get_text(q_count):
     return st.text_input(label=label, value=value, key="input", on_change=form_callback)
 
 
+import traceback
+
+
 def main():
     st.subheader("​🎬  IMDBot - Powered by OctoAI")
     st.markdown(
@@ -175,28 +188,27 @@ def main():
     st.markdown("### Welcome to the IMDBot demo")
     st.sidebar.image(
         "octoml-octo-ai-logo-color.png",
-        caption="Try OctoML's new compute service for free by signing up for early access: https://octoml.ai/",
+        caption="Try OctoML's new compute service for free by signing up here: https://octoml.ai/",
     )
     # Setup the environment variables
     setup_env_variables()
+    # Display the header
     # Set the endpoint url
     endpoint_url = os.getenv("ENDPOINT_URL")
-    # Initialize the session state
-    handle_session_state()
-    # Load the data
-    documents = load_data(Path("rotten_tomatoes_top_movies.csv"))
-    # Initialize the LLM predictor
-    llm_predictor = initialize_llm(endpoint_url)
-    # Create the embeddings
-    embeddings = create_embeddings()
-    # Create the service context
-    service_context = create_service_context(llm_predictor, embeddings)
-    # Create the index
-    index = create_index(documents, service_context)
-    # Create the query engine
-    query_engine = create_query_engine(index, llm_predictor)
-    # Display the header
+
     try:
+        # Initialize the session state
+        handle_session_state()
+        # Load the data
+        documents = load_data(Path("rotten_tomatoes_top_movies.csv"))
+        # Create the embeddings
+        embedding_model = create_embedding(documents)
+        # Create the index
+        index = create_index(documents, embedding_model)
+        # Initialize the LLM predictor
+        llm_predictor = initialize_llm(endpoint_url)
+        # Create the query engine
+        query_engine = create_query_engine(index)
         # Get the user input
         user_input = get_text(q_count=st.session_state["q_count"])
         # If user input is not empty, process the input
@@ -207,6 +219,7 @@ def main():
                         "text": user_input,
                     }
                 },
+                llm_predictor,
                 query_engine,
             )
             # Increment q_count, append user input and generated output to session state
@@ -221,7 +234,10 @@ def main():
                 message(st.session_state["generated"][i], key=str(i))
 
     except Exception as e:
-        st.error("Something went wrong. Please try again.")
+        tb = traceback.format_exc()
+
+        # Display the error message with traceback
+        st.error(f"Something went wrong: {e}\n\nTraceback:\n{tb} Please try again.")
 
 
 if __name__ == "__main__":

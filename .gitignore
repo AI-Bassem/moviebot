@@ -1,3 +1,4 @@
 __pycache__/octoai_endpoint.cpython-39.pyc
 streamlit_chat/frontend/.DS_Store
 .DS_Store
+.streamlit/secrets.toml

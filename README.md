@@ -5,11 +5,10 @@ In this tutorial, we'll build a chat app that lets a user ask questions about [R
 This walkthrough assumes you already have some basic familiarity with the OctoAI Compute Service. If you haven't already read the [Getting Started](https://docs.octoai.cloud/docs/getting-started) section of our docs, we highly recommend you do so now. If this is your first time building an end-to-end Generative AI application, check out the Stable Diffusion example.
 
 - [OctoAI compute service](https://octoai.cloud/): The OctoAI compute service provides fast and simple Machine Learning inference capability for us. In general, it can turn any container or Python code into a production-grade endpoint in minutes.
-- [LLama2-7B ](https://huggingface.co/meta-llama/Llama-2-7b): This is the open-source transformer model at the heart of our chat app. 
+- [LLama2-13B ](https://huggingface.co/meta-llama/Llama-2-13b): This is the open-source transformer model at the heart of our chat app. 
 - [Streamlit](https://github.com/streamlit): A tool for building lightweight, beautiful, and shareable Python-based web applications.
 - [Miniconda](https://docs.conda.io/en/latest/miniconda.html): A useful package and environment manager that includes both Python and pip out of the box. The standard Python distribution includes each of the following libraries that we’ll leverage in our application:
   - [Requests](https://requests.readthedocs.io/en/latest/): Allows us to send and receive HTTP requests and responses using Python code. We use this library to make it easy to access the OctoML compute service; we simply provide some basic information including the URL and the stable diffusion parameters that we want to send.
-  - [LlamaIndex](https://gpt-index.readthedocs.io/en/latest/): A "data framework" for LLMs that allows us to do things like connect to documents and databases, structure our data for LLMs, run queries, and integrate with popular applications and frameworks.
   - [Langhchain](https://python.langchain.com/en/latest/index.html): A popular library for building LLM applications, Langchain extends LLM capabilities through the use of constructs called `Agents` and `Chains`. Used in concert, these constructs allow us to build more complex applications that can be deployed to production.
 
 
@@ -44,7 +43,7 @@ Now that you have built your application, you can deploy it locally within your 
 # How it works:
 
 - Rotten Tomatoes movie data is loaded from the `.csv` file. 
-- The loaded docs are indexed using Instructor-Large model and GPTVectorStoreIndex from llama_index package.
-- User inputs are queried against this index using QueryEngine from LlamaIndex. 
+- The loaded docs are indexed using Instructor-Large model and FAISS from Langchain package.
+- User inputs are queried against this index using FAISS from Langchain. 
 - The relevant text from the index is then sent to the OctoAI LLM endpoint using langchain. 
 - Responses from the OctoAI API are displayed in the Streamlit chat interface

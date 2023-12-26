@@ -1,21 +1,27 @@
 {
-   "version": "0.2.0",
-   "configurations": [{
-        "name": "Python: Streamlit",
-        "type": "python",
-        "request": "launch",
-        "module": "streamlit",
-        "env": {
-            "STREAMLIT_APP": "app.py",
-            "STREAMLIT_ENV": "development",
-            "AWS_PROFILE": "mega_root",
-            "PYTHONPATH": "${workspaceRoot}/src",
-        },
-        "args": [
-            "run",
-            "chatbot.py"
-        ],
-        "jinja": true
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Python: Current File",
+      "type": "python",
+      "request": "launch",
+      "program": "${file}",
+      "console": "integratedTerminal",
+      "justMyCode": true
+    },
+    {
+      "name": "Python: Streamlit",
+      "type": "python",
+      "request": "launch",
+      "module": "streamlit",
+      "env": {
+        "STREAMLIT_APP": "app.py",
+        "STREAMLIT_ENV": "development",
+        "AWS_PROFILE": "mega_root",
+        "PYTHONPATH": "${workspaceRoot}/src"
+      },
+      "args": ["run", "chatbot.py"],
+      "jinja": true
     }
-   ]
+  ]
 }
