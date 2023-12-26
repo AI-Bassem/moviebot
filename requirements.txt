@@ -11,3 +11,4 @@ transformers
 dill
 octoai-sdk
 tiktoken
+faiss
