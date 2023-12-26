@@ -11,4 +11,4 @@ transformers
 dill
 octoai-sdk
 tiktoken
-faiss
+faiss-cpu
